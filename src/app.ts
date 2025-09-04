@@ -109,8 +109,18 @@ app.post("/api/customers/:id/purchase", (req: Request, res: Response): void => {
         customer.lastStatusChange = new Date().toISOString();
     }
 
-    // Tracks the location of the purchase
+    // Create new purchase
+    const newPurchase: Purchase = {
+        amount: purchaseAmount,
+        store: storeLocation,
+        date: new Date().toISOString()
+    }
+    // Create Purchase history if it doesn't exist
+    if (!customer.purchaseHistory) {
+        customer.purchaseHistory = [];
+    }
 
+    customer.purchaseHistory.push(newPurchase);
     res.json(customer);
 });
 
