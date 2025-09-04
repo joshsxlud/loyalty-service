@@ -78,8 +78,16 @@ app.post("/api/customers/:id/purchase", (req: Request, res: Response): void => {
 
     const purchaseAmount: number = req.body.amount;
     const storeLocation: string = req.body.storeLocation;
+    const pointMultiplier: number = 1.25;
 
-    customer.points += Math.floor(purchaseAmount / 10);
+    // Multiply the customer's points by 1.25 if at their preferred store
+    // Otherwise just add points regularly 
+    if (customer.preferredStore === storeLocation) {
+        customer.points += Math.floor(purchaseAmount / 10) * pointMultiplier;    
+    } else {
+        customer.points += Math.floor(purchaseAmount / 10);
+    }
+
     customer.lastPurchaseDate = new Date().toISOString();
 
     if (customer.points >= 750) {
@@ -89,6 +97,8 @@ app.post("/api/customers/:id/purchase", (req: Request, res: Response): void => {
         customer.status = "SILVER";
         customer.lastStatusChange = new Date().toISOString();
     }
+
+    // Tracks the location of the purchase
 
     res.json(customer);
 });
