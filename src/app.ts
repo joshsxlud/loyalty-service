@@ -14,6 +14,17 @@ interface Customer {
     joinDate: string;
     notifications: boolean;
     lastStatusChange?: string;
+    purchaseHistory?: Purchase[];
+
+}
+
+/**
+ * Interface representing a purchase.
+ */
+interface Purchase {
+    amount: number;
+    store: string;
+    date: string;
 }
 
 const customers: Customer[] = [
