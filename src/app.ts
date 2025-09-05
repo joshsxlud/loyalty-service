@@ -14,6 +14,17 @@ interface Customer {
     joinDate: string;
     notifications: boolean;
     lastStatusChange?: string;
+    purchaseHistory?: Purchase[];
+
+}
+
+/**
+ * Interface representing a purchase.
+ */
+interface Purchase {
+    amount: number;
+    store: string;
+    date: string;
 }
 
 const customers: Customer[] = [
@@ -78,8 +89,16 @@ app.post("/api/customers/:id/purchase", (req: Request, res: Response): void => {
 
     const purchaseAmount: number = req.body.amount;
     const storeLocation: string = req.body.storeLocation;
+    const pointMultiplier: number = 1.25;
 
-    customer.points += Math.floor(purchaseAmount / 10);
+    // Multiply the customer's points by 1.25 if at their preferred store
+    // Otherwise just add points regularly 
+    if (customer.preferredStore === storeLocation) {
+        customer.points += Math.floor(purchaseAmount / 10) * pointMultiplier;    
+    } else {
+        customer.points += Math.floor(purchaseAmount / 10);
+    }
+
     customer.lastPurchaseDate = new Date().toISOString();
 
     if (customer.points >= 750) {
@@ -90,6 +109,18 @@ app.post("/api/customers/:id/purchase", (req: Request, res: Response): void => {
         customer.lastStatusChange = new Date().toISOString();
     }
 
+    // Create new purchase
+    const newPurchase: Purchase = {
+        amount: purchaseAmount,
+        store: storeLocation,
+        date: new Date().toISOString()
+    }
+    // Create Purchase history if it doesn't exist
+    if (!customer.purchaseHistory) {
+        customer.purchaseHistory = [];
+    }
+
+    customer.purchaseHistory.push(newPurchase);
     res.json(customer);
 });
 
