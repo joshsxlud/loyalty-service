@@ -156,4 +156,32 @@ app.patch(
     }
 );
 
+app.get("/api/analytics/loyaltyProgram", (req: Request, res: Response): void => {
+    let bronzeMembers: number = 0;
+    let silverMembers: number = 0;
+    let goldMembers: number = 0;
+    let totalPoints: number = 0;
+
+    customers.forEach((customer) => {
+        totalPoints += customer.points;
+
+        if (customer.status === "BRONZE") {
+            bronzeMembers += 1;
+        } else if (customer.status === "SILVER") {
+            silverMembers += 1;
+        } else if (customer.status === "GOLD") {
+            goldMembers += 1;
+        } else {
+            console.log("Customer does not have a status.")
+        }
+    })
+    res.json({
+        totalPoints: totalPoints,
+        totalCustomers: customers.length,
+        bronzeMembers: bronzeMembers,
+        silverMembers: silverMembers,
+        goldMembers: goldMembers
+    })
+});
+
 export default app;
